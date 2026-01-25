@@ -118,7 +118,7 @@ MASTER_PROMPT
 
 4. You can experiment with different models (in the case of [openrouter](https://openrouter.ai/) it's quite simple: just select the desired model from the web catalog) by changing .env and re-running `docker compose up --build`
 
-5. frida was added to the repository for simplicity, as many users may experience problems when using or downloading it. You can use any other encoder model according to your needs and discretion.
+5. You can download frida to `app/frida` from [HF](https://huggingface.co/ai-forever/FRIDA/tree/main).The use of the model locally is due to the fact that some users may experience problems when using it by default way. You can use any other encoder model according to your needs and discretion.
 
 6. Using Python, you can easily experiment with new mcp-tools to suit your needs `app/tools`
 
