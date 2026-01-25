@@ -67,7 +67,7 @@ MODEL_BASE_URL
 # URL for qdrant (http://qdrant:6333)
 QDRANT_URL
 # Collection of knowledges in QDrant (my_collection)
-QDRANT_COLLECTION_NAME=my_collection
+QDRANT_COLLECTION_NAME
 # Prompt for LLM before starting a dialogue
 MASTER_PROMPT
 # Encoder-model inside container (/tmp/ai_sidekick/app/frida)
@@ -103,7 +103,7 @@ ENCODER
 # URL for qdrant (http://localhost:6333)
 QDRANT_URL
 # Collection of knowledges in QDrant (my_collection)
-QDRANT_COLLECTION_NAME=my_collection
+QDRANT_COLLECTION_NAME
 # Prompt for LLM for generating payloads properly
 MASTER_PROMPT
 ```
