@@ -23,6 +23,8 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    volumes:
+      - ../app:/tmp/ai_sidekick/app
     command: uvicorn app.client:app --host 0.0.0.0 --port 8000 --workers 1
 
   telegram-bot:
@@ -33,6 +35,8 @@ services:
     restart: unless-stopped
     ports:
       - "8001:8001"
+    volumes:
+      - ../bot:/tmp/ai_sidekick/bot
     command: python bot/bot.py
     depends_on:
       - qdrant

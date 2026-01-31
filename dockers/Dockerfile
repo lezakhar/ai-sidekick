@@ -16,6 +16,4 @@ COPY pyproject.toml .python-version ./
 
 RUN uv pip install --system .
 
-COPY app/ ./app/
-
 ENV PYTHONPATH=/tmp/ai_sidekick/app

@@ -46,7 +46,7 @@ class TelegramBot:
         user_query: str,
     ) -> str:
         result = await self.api_request(
-            endpoint="/query",
+            endpoint="/chat",
             user_id=user_id,
             user_name=user_name,
             user_query=user_query,

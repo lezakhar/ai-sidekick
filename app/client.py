@@ -48,14 +48,14 @@ async def generate_answer(request: QueryRequest) -> str:
         return f"an error occurred while processing your request: {str(e)}"
 
 
-@app.post("/query")
-async def process_query(request: QueryRequest):
+@app.post("/chat")
+async def chat(request: QueryRequest):
     try:
         answer = await generate_answer(request)
         user_dialog[request.user_id] += 1
 
         if user_dialog[request.user_id] >= 3:
-            answer = f"{answer} \n 🔄контекст сброшен🔄"
+            answer = f"{answer} \n 🔄context reset🔄"
             user_dialog[request.user_id] = 0
 
         return {"answer": answer}

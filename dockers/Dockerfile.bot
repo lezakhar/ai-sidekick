@@ -10,6 +10,4 @@ WORKDIR /tmp/ai_sidekick
 COPY requirements_bot.txt ./
 RUN pip install --no-cache-dir -r requirements_bot.txt
 
-COPY bot/ ./bot/
-
 ENV PYTHONPATH=/tmp/ai_sidekick/bot

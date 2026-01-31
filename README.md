@@ -4,8 +4,8 @@ Personal AI Assistant with knowledge base integration
 
 ## Overview
 Open-source solution for creating a personal AI assistant with:
-- RAG baseline
-- knowledge base management via QDrant and python
+- RAG (Retrieval Augmented Generation) baseline
+- knowledge base management via Qdrant and python
 - simple docker-based deployment
 - telegram bot dialog window
 
@@ -18,23 +18,29 @@ _This solution is recommended for testing and experimenting with various RAG app
 
 ## Quick Start
 
-### prepare configs
+### 1. Prepare configs
 
-properly fill `configs.py` and `.env` files (see the configurations section below)
+**properly** fill `configs.py` and `.env` files (see the configurations section below)
 
-### start services
+### 2. Start docker services
 
 ```bash
-docker compose up -d --build
+docker-compose up --build
 ```
 
-### init uv
+or 
+
+```bash
+docker-compose up -d --build
+```
+
+### 3. Install dependencies
 
 ```bash
 uv venv .venv && uv sync
 ```
 
-### Initialize knowledge base
+### 4. Initialize knowledge base
 
 generate data to .json file
 ```bash
@@ -46,9 +52,9 @@ upsert generated data to a QDrant
 uv run data/upload_data.py
 ```
 
-check upserted data in your collection (http://localhost:6333/dashboard#/collections)
+check upserted data in your [collection](http://localhost:6333/dashboard#/collections)
 
-### Engoy your personal AI-assistant at telegram bot!
+### 5. Enjoy your personal AI-assistant at telegram bot!
 
 
 ## Configurations
@@ -58,7 +64,7 @@ _To make filling in environment variables easier, you can find example of .env f
 
 ### app/configs.py
 ```env
-# main LLM (must support tools) for generating answer (LLM must support google/gemini-2.0-flash-001)
+# main LLM (must support tools) for generating answer (google/gemini-2.0-flash-001)
 MODEL
 # the API key of the provider you are using (openrouter etc)
 MODEL_API_KEY 
@@ -68,9 +74,9 @@ MODEL_BASE_URL
 QDRANT_URL
 # Collection of knowledges in QDrant (my_collection)
 QDRANT_COLLECTION_NAME
-# Prompt for LLM before starting a dialogue
+# System prompt for LLM before starting a dialogue
 MASTER_PROMPT
-# Encoder-model inside container (/tmp/ai_sidekick/app/frida)
+# Encoder-model inside container (/tmp/ai_sidekick/app/encoders/frida)
 ENCODER
 # the number of documents that will be found by semantic search from the total document pool (the more documents, the larger this window should be) (10 is good for start)
 TOP_K_SEMANTIC_POINTS
@@ -82,7 +88,7 @@ TOP_K_SEMANTIC_POINTS
 CLIENT_URL
 # The token the bot's father gives you after creating a bot
 TELEGRAM_BOT_TOKEN
-# List of telegram users that can use your bot (this is your telegram username's after @) 
+# List of telegram users that can use your bot (this is your telegram username's after @)
 WHITELIST
 ```
 
@@ -110,23 +116,20 @@ MASTER_PROMPT
 
 ## Notes
 
-1. You can easily create a telegram bot using [@BotFather](https://telegram.me/BotFather)
+1. You can experiment with diffrent configs, llms, encoders or tools. Just properly change it and restart containers `docker-compose restart`. In the case of llms, it's quite convenient via [openrouter](https://openrouter.ai/). (_Please note that openrouter is a cloud platform and there is no guarantee that your data will be completely anonymous. They're working hard to ensure this, though, and you can minimize this risk_).
 
-2. Currently, the knowledge base is assumed to be a set of folders containing .md files. These easily can be edited and viewed using [Obsidian](https://obsidian.md/)
+2. The quality of semantic search is greatly affected by the choice of encoder model. In this implementation, the frida model is selected by default. You can work with the model locally by downloading it from [here](https://drive.google.com/file/d/1uLCgPd7doJtO8ICcOcZqocLJ2juJU3Oz/view?usp=drive_link) or use it via [HiggingFace](https://huggingface.co/ai-forever/FRIDA/tree/main) directly. _(The use of the model locally is due to the fact that some users may experience problems when using it via HF or same way)_. You can use any other encoder model according to your needs and discretion.
 
-3. To update data after editing your knowledge base -- clear your [QDrant collection](http://localhost:6333/dashboard#/collections) and reinitialize knowledge base
+3. Currently, the knowledge base is assumed to be a set of folders containing `.md` files. These easily can be edited and viewed using [Obsidian](https://obsidian.md/). _By the way everything is limited only by your imagination._
 
-4. You can experiment with different models (in the case of [openrouter](https://openrouter.ai/) it's quite simple: just select the desired model from the web catalog) by changing .env and re-running `docker compose up --build`
+4. To update data after editing your knowledge base: clear your [Qdrant collection](http://localhost:6333/dashboard#/collections) and reinitialize it.
 
-5. You can download frida to `app/frida` from [HF](https://huggingface.co/ai-forever/FRIDA/tree/main).The use of the model locally is due to the fact that some users may experience problems when using it by default way. You can use any other encoder model according to your needs and discretion.
+5. You can easily create a telegram bot using [@BotFather](https://telegram.me/BotFather).
 
-6. Using Python, you can easily experiment with new mcp-tools to suit your needs `app/tools`
-
-7. This solution is primarily designed for the Russian knowledge base. To rebuild it in your language, it would be advisable to make the appropriate adjustments: 
-    1. modify the master prompts
-    2. change language in retrieve tool
-    3. change the encoder model
-
+6. This solution is primarily designed for the Russian knowledge base. To rebuild it in your language, it would be advisable to make the appropriate adjustments: 
+    1. change the encoder model
+    2. change docs language in retrieve tool
+    3. modify the master prompts
 
 
 
