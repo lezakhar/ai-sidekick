@@ -19,6 +19,8 @@ build/
 .venv/
 .werf_secret_key
 uv.lock
+app/encoders
+data/payloads.json
 
 # IDE
 .vscode/

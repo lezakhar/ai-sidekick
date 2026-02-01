@@ -36,10 +36,15 @@ async def generate_answer(request: QueryRequest) -> str:
 
         user_context[request.user_id].append(HumanMessage(content=request.user_query))
         response = await agent.get_response(user_context[request.user_id])
-
         answer = response["messages"][-1].content
-        user_context[request.user_id].append(AIMessage(content=answer))
 
+        if response["messages"][-1].invalid_tool_calls:
+            return "Error calling tool. Try fix the prompt, tool or change llm"
+
+        if not answer:
+            return "Llm's response is empty, something went wrong."
+
+        user_context[request.user_id].append(AIMessage(content=answer))
         return answer
 
     except Exception as e:
