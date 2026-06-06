@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 
@@ -54,11 +52,11 @@ def search_points(
     return sorted(top_k_points, key=lambda x: x.score, reverse=True)[:2]
 
 
-@tool
+@tool(response_format="content_and_artifact")
 def retrieve(
     user_query: str,
     keywords: list[str],
-) -> str:
+) -> tuple[str, list[int]]:
     """Получить информацию из векторной базы знаний
     Args:
         user_query: Запрос пользователя (строка str)
@@ -67,8 +65,9 @@ def retrieve(
             Пример: ["сантехник", "водопровод", "ремонт", "контакты", "мастер"]
     Returns:
         str: Сформированный контекст из Базы знаний
+        list[int]: Идентификаторы документов из Базы знаний (на основе которых сформирован контекст)
     Note:
-        LLM Необходимо самостоятельно на русском языке отредактировать запрос пользователя 
+        LLM Необходимо самостоятельно на русском языке отредактировать запрос пользователя
         и сформировать список ключевых слов на русском языке перед вызовом метода.
     """
     top_points = search_points(
@@ -77,8 +76,9 @@ def retrieve(
         encoder=encoder,
     )
 
+    retrieved_docs: list = []
     if not top_points:
-        return "Релевантные знания отсутствуют"
+        return "Релевантные знания отсутствуют", retrieved_docs
 
     context = "Найденные знания:" + "\n"
 
@@ -92,4 +92,6 @@ def retrieve(
         knowledge = f"source_file: {source_file}\ntitle: {title}\ntext: {text}\n"
         context += knowledge
 
-    return context
+        retrieved_docs.append(point.id)
+
+    return context, retrieved_docs

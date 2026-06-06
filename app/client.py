@@ -1,7 +1,7 @@
 from collections import defaultdict
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
 
 from agent import Agent
 from tools.retrieve import retrieve
@@ -17,6 +17,12 @@ class QueryRequest(BaseModel):
     user_query: str
 
 
+class ChatResponse(BaseModel):
+    answer: str
+    context: str
+    retrieved_docs: list
+
+
 user_context: dict = defaultdict(list)
 user_dialog: dict = defaultdict(int)
 agent = Agent(
@@ -27,7 +33,7 @@ agent = Agent(
 )
 
 
-async def generate_answer(request: QueryRequest) -> str:
+async def generate_answer(request: QueryRequest) -> tuple[str, str, list]:
     try:
         if not user_context[request.user_id]:
             user_context[request.user_id].append(
@@ -36,34 +42,53 @@ async def generate_answer(request: QueryRequest) -> str:
 
         user_context[request.user_id].append(HumanMessage(content=request.user_query))
         response = await agent.get_response(user_context[request.user_id])
+
+        context = ""
+        retrieved_docs = []
+        for message in response.get("messages", []):
+            if hasattr(message, 'content') and isinstance(message, ToolMessage):
+                context = message.content
+                if hasattr(message, 'artifact'):
+                    retrieved_docs = message.artifact
+                break
+
         answer = response["messages"][-1].content
 
         if response["messages"][-1].invalid_tool_calls:
-            return "Error calling tool. Try fix the prompt, tool or change llm"
+            return "Error calling tool. Try fix the prompt, tool or change llm", "", []
 
         if not answer:
-            return "Llm's response is empty, something went wrong."
+            return "Llm's response is empty, something went wrong.", "", []
 
         user_context[request.user_id].append(AIMessage(content=answer))
-        return answer
+        return answer, context, retrieved_docs
 
     except Exception as e:
         print(f"error: {e}")
         user_context[request.user_id].pop()
-        return f"an error occurred while processing your request: {str(e)}"
+        return f"an error occurred while processing your request: {str(e)}", "", []
 
 
 @app.post("/chat")
 async def chat(request: QueryRequest):
     try:
-        answer = await generate_answer(request)
+        answer, context, retrieved_docs = await generate_answer(request)
         user_dialog[request.user_id] += 1
 
         if user_dialog[request.user_id] >= 3:
             answer = f"{answer} \n 🔄context reset🔄"
             user_dialog[request.user_id] = 0
 
-        return {"answer": answer}
+        print(f"{answer=}")
+        print(f"{context=}")
+        print(f"{retrieved_docs=}")
+
+        return ChatResponse(
+            answer=answer,
+            context=context,
+            retrieved_docs=retrieved_docs,
+        ).model_dump()
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))

@@ -3,13 +3,17 @@ import aiohttp
 from collections import defaultdict
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
+from aiogram.client.session.aiohttp import AiohttpSession
 
 import configs
 
 
 class TelegramBot:
     def __init__(self):
-        self.bot = Bot(token=configs.TELEGRAM_BOT_TOKEN)
+        self.bot = Bot(
+            token=configs.TELEGRAM_BOT_TOKEN,
+            session=AiohttpSession(proxy=configs.PROXY_URL if configs.PROXY_URL else None),
+        )
         self.dp = Dispatcher()
         self.user_processing: dict = defaultdict(bool)
 

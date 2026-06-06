@@ -66,6 +66,8 @@ def _generate_payloads(knowledge: dict) -> list[dict]:
 
 def generate():
     knowledge_list = _find_knowledges(configs.KBASE_PATH)
+    print(configs.KBASE_PATH)
+    print(knowledge_list)
 
     all_payloads = []
 

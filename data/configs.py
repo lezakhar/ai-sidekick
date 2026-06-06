@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-KBASE_PATH = "data/kbase"
-FILE_PATH = "data/payloads"
+KBASE_PATH = "/home/argentum/self/projects/ai-sidekick/data/kbase"
+FILE_PATH = "payloads"
 
 MODEL: str = str(os.getenv("MODEL"))
 MODEL_BASE_URL: str = str(os.getenv("MODEL_BASE_URL"))
