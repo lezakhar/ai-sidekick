@@ -26,7 +26,7 @@ class Point:
 
         self.title = title
         self.text = text
-        self.id = id if id else _text_to_int_id(self.title)
+        self.id = id if (id is not None) else _text_to_int_id(self.title)
         self.payload = {
             "title": self.title,
             "text": self.text,

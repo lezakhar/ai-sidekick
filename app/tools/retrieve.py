@@ -76,12 +76,12 @@ def retrieve(
         encoder=encoder,
     )
 
-    retrieved_docs: list = []
+    
     if not top_points:
-        return "Релевантные знания отсутствуют", retrieved_docs
+        return "Релевантные знания отсутствуют", []
 
     context = "Найденные знания:" + "\n"
-
+    retrieved_docs: list = []
     for point in top_points:
         payload = point.payload
 
